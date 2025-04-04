@@ -1,43 +1,36 @@
--- Create database and tables
+-- Create database
 CREATE DATABASE IF NOT EXISTS portfolio_db;
 USE portfolio_db;
 
+-- Create contacts table
 CREATE TABLE IF NOT EXISTS contacts (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    subject VARCHAR(200),
     message TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_archived BOOLEAN DEFAULT FALSE
 );
 
--- Create a table to store downloadable CV metadata
-CREATE TABLE IF NOT EXISTS downloadable_cv (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    file_name VARCHAR(255) NOT NULL,
-    file_path VARCHAR(255) NOT NULL,
-    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Create user with minimal privileges
-CREATE USER IF NOT EXISTS 'portfolio_js'@'localhost' IDENTIFIED BY 'JsSecurePass123!';
-GRANT INSERT, SELECT ON portfolio_db.contacts TO 'portfolio_js'@'localhost';
+-- Create user with limited privileges
+CREATE USER IF NOT EXISTS 'portfolio_user'@'localhost' IDENTIFIED BY 'SecurePass123!';
+GRANT INSERT, SELECT ON portfolio_db.contacts TO 'portfolio_user'@'localhost';
 FLUSH PRIVILEGES;
 
+-- Optional: Create messages table for WebSQL sync
+CREATE TABLE IF NOT EXISTS offline_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    subject VARCHAR(200),
+    message TEXT NOT NULL,
+    date_sent DATETIME NOT NULL,
+    is_synced BOOLEAN DEFAULT FALSE,
+    sync_attempts INT DEFAULT 0,
+    last_attempt TIMESTAMP NULL
+);
 
-
--- Query to test the database and table
-USE portfolio_db;
-
--- Insert a sample record into the contacts table
-INSERT INTO contacts (name, email, message) 
-VALUES ('John Doe', 'john.doe@example.com', 'This is a test message.');
-
--- Insert metadata for the CV file
-INSERT INTO downloadable_cv (file_name, file_path) 
-VALUES ('my resume.pdf', '/path/to/my resume.pdf');
-
--- Select all records from the contacts table
-SELECT * FROM contacts;
-
--- Query to retrieve the CV metadata
-SELECT * FROM downloadable_cv;
+-- Index for better performance
+CREATE INDEX idx_contacts_email ON contacts(email);
+CREATE INDEX idx_offline_sync_status ON offline_messages(is_synced);

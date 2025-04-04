@@ -6,18 +6,20 @@ const contactForm = document.getElementById('contact-form');
 const formMessage = document.getElementById('form-message');
 
 // Set current year in footer
-currentYear.textContent = new Date().getFullYear();
+if (currentYear) {
+    currentYear.textContent = new Date().getFullYear();
+}
 
-// Dark/Light Mode Toggle - Fixed version
+// Dark/Light Mode Toggle
 function switchTheme(e) {
     if (e.target.checked) {
         document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('theme', 'dark');
-        toggleIcon.innerHTML = '<i class="fas fa-sun"></i>';
+        toggleIcon.innerHTML = '<i class="fas fa-sun"></i> Dark Mode';
     } else {
         document.documentElement.setAttribute('data-theme', 'light');
         localStorage.setItem('theme', 'light');
-        toggleIcon.innerHTML = '<i class="fas fa-moon"></i>';
+        toggleIcon.innerHTML = '<i class="fas fa-moon"></i> Light Mode';
     }
 }
 
@@ -27,15 +29,14 @@ if (currentTheme) {
     document.documentElement.setAttribute('data-theme', currentTheme);
     if (currentTheme === 'dark') {
         themeSwitch.checked = true;
-        toggleIcon.innerHTML = '<i class="fas fa-sun"></i>';
-    } else {
-        themeSwitch.checked = false;
-        toggleIcon.innerHTML = '<i class="fas fa-moon"></i>';
+        toggleIcon.innerHTML = '<i class="fas fa-sun"></i> Dark Mode';
     }
 }
 
 // Event Listeners
-themeSwitch.addEventListener('change', switchTheme);
+if (themeSwitch) {
+    themeSwitch.addEventListener('change', switchTheme);
+}
 
 // Smooth scrolling for all links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -61,9 +62,9 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Enhanced Contact Form with WebSQL Integration
+// Contact Form Handling
 if (contactForm) {
-    contactForm.addEventListener('submit', function (e) {
+    contactForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
         // Get form values
@@ -89,33 +90,51 @@ if (contactForm) {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
         submitBtn.disabled = true;
 
-        // WebSQL integration
-        const db = openDatabase('PortfolioDB', '1.0', 'Portfolio Database', 2 * 1024 * 1024);
+        try {
+            // Try to send to server first
+            const response = await fetch('http://localhost:3000/api/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, subject, message })
+            });
 
-        db.transaction(function (tx) {
-            // Create table if it doesn't exist
-            tx.executeSql(
-                'CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, name TEXT, email TEXT, subject TEXT, message TEXT, date TEXT)'
-            );
-
-            // Insert form data into the table
-            tx.executeSql(
-                'INSERT INTO messages (name, email, subject, message, date) VALUES (?, ?, ?, ?, ?)',
-                [name, email, subject, message, new Date().toISOString()],
-                function () {
-                    showFormMessage('Message saved successfully! I will get back to you soon.', 'success');
-                    contactForm.reset();
-                },
-                function (tx, error) {
-                    console.error('Error:', error);
-                    showFormMessage('There was an error saving your message. Please try again later.', 'error');
-                }
-            );
-        });
-
-        // Reset button state
-        submitBtn.innerHTML = originalBtnText;
-        submitBtn.disabled = false;
+            const result = await response.json();
+            
+            if (response.ok) {
+                showFormMessage(result.success || 'Message sent successfully!', 'success');
+                contactForm.reset();
+            } else {
+                throw new Error(result.error || 'Failed to send message');
+            }
+        } catch (error) {
+            console.error('Server submission failed, falling back to WebSQL:', error);
+            
+            // WebSQL fallback
+            const db = openDatabase('PortfolioDB', '1.0', 'Portfolio Database', 2 * 1024 * 1024);
+            
+            db.transaction(function(tx) {
+                tx.executeSql(
+                    'CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, name TEXT, email TEXT, subject TEXT, message TEXT, date TEXT)'
+                );
+                
+                tx.executeSql(
+                    'INSERT INTO messages (name, email, subject, message, date) VALUES (?, ?, ?, ?, ?)',
+                    [name, email, subject, message, new Date().toISOString()],
+                    function() {
+                        showFormMessage('Message saved offline! I will get it when back online.', 'success');
+                        contactForm.reset();
+                    },
+                    function(tx, error) {
+                        console.error('WebSQL error:', error);
+                        showFormMessage('Failed to save message. Please try again later.', 'error');
+                    }
+                );
+            });
+        } finally {
+            // Reset button state
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+        }
     });
 }
 
@@ -127,6 +146,8 @@ function validateEmail(email) {
 
 // Show form message
 function showFormMessage(msg, type) {
+    if (!formMessage) return;
+    
     formMessage.textContent = msg;
     formMessage.className = type;
     formMessage.style.display = 'block';
@@ -139,7 +160,7 @@ function showFormMessage(msg, type) {
 
 // Animate elements when they come into view
 const animateOnScroll = () => {
-    const elements = document.querySelectorAll('.timeline-item, .skill-card, .contact-card');
+    const elements = document.querySelectorAll('.timeline-item, .skill-card, .contact-card, .experience-card');
     
     elements.forEach(element => {
         const elementPosition = element.getBoundingClientRect().top;
@@ -154,7 +175,7 @@ const animateOnScroll = () => {
 
 // Set initial state for animated elements
 window.addEventListener('DOMContentLoaded', () => {
-    const elements = document.querySelectorAll('.timeline-item, .skill-card, .contact-card');
+    const elements = document.querySelectorAll('.timeline-item, .skill-card, .contact-card, .experience-card');
     elements.forEach(element => {
         element.style.opacity = '0';
         element.style.transform = 'translateY(20px)';
