@@ -23,10 +23,7 @@ CREATE USER IF NOT EXISTS 'portfolio_js'@'localhost' IDENTIFIED BY 'JsSecurePass
 GRANT INSERT, SELECT ON portfolio_db.contacts TO 'portfolio_js'@'localhost';
 FLUSH PRIVILEGES;
 
--- Example connection to MySQL database
--- Replace 'localhost', 'portfolio_js', and 'JsSecurePass123!' with your actual host, username, and password if different.
--- Paste this in MySQL Workbench to test the connection.
--- CONNECT 'localhost' AS 'portfolio_js' IDENTIFIED BY 'JsSecurePass123!';
+
 
 -- Query to test the database and table
 USE portfolio_db;
