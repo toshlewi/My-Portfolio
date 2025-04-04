@@ -22,14 +22,20 @@
     --primary-color: #3498db;
     --secondary-color: #2c3e50;
     --accent-color: #e74c3c;
-    --text-color: #333;
-    --text-light: #777;
+    --text-color: #222; /* Darker text for better contrast */
+    --text-light: #0f0101; /* Slightly darker light text for readability */
     --bg-color: #f9f9f9;
-    --card-bg: #fff;
+    --card-bg: #ffffff;
     --border-color: #e0e0e0;
     --shadow-color: rgba(0, 0, 0, 0.1);
+    
 }
-
+.education-list {
+    font-weight: 600;
+    text-color: black;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
 /* Smooth transitions for theme switching */
 * {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
