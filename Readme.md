@@ -19,6 +19,7 @@ graph TD
     A -->|IndexedDB| D[Offline Cache]
     C --> E[Analytics Dashboard]
 ```
+
 ````
 
 ## 🧩 Technology Stack
@@ -30,6 +31,8 @@ My SQL 8.0
 Netlify Edge
 
 ## 🚀 Quick Deployment
+# Link to my Website
+https://toshlewiportfolio.netlify.app/
 
 ```bash
 # Clone repository
@@ -47,9 +50,9 @@ echo "DB_USER=portfolio_js" >> .env
 
 ## 📬 Contact
 
-For collaborations:  
-📧 adelewigitz@gmail.com  
-📞 +254 711 527211  
+For collaborations:
+📧 adelewigitz@gmail.com
+📞 +254 711 527211
 🔗 [LinkedIn Profile](https://linkedin.com/in/lewis-gitonga-12783b34a)
 
 ```
@@ -72,3 +75,4 @@ Key improvements made:
    - Clearer section headers
    - More specific tech versions
 ```
+````
