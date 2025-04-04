@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS contacts (
 );
 
 -- Create user with limited privileges
-CREATE USER IF NOT EXISTS 'portfolio_user'@'localhost' IDENTIFIED BY 'SecurePass123!';
-GRANT INSERT, SELECT ON portfolio_db.contacts TO 'portfolio_user'@'localhost';
+CREATE USER IF NOT EXISTS 'tosh'@'localhost' IDENTIFIED BY '#Toshlewi254';
+GRANT INSERT, SELECT ON portfolio_db.contacts TO 'tosh'@'localhost';
 FLUSH PRIVILEGES;
 
 -- Optional: Create messages table for WebSQL sync

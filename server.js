@@ -15,8 +15,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // MySQL Connection
 const db = mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'portfolio_user',
-    password: process.env.DB_PASSWORD || 'SecurePass123!',
+    user: process.env.DB_USER || 'tosh',
+    password: process.env.DB_PASSWORD || '#Toshlewi254',
     database: process.env.DB_NAME || 'portfolio_db',
     port: process.env.DB_PORT || 3306
 });
